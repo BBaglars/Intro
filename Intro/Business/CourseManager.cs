@@ -1,4 +1,6 @@
-﻿using Intro.Entities;
+﻿using Intro.DataAccess.Abstract;
+using Intro.DataAccess.Concretes;
+using Intro.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,34 +11,31 @@ namespace Intro.Business;
 
 public class CourseManager
 {
-    Course[] courses = new Course[3];
+    //dependency injection 
+    ICourseDal _courseDal;
 
-    public CourseManager()
+    public CourseManager(ICourseDal courseDal)
     {
-        Course course1 = new Course();
-        course1.Id = 1;
-        course1.Name = "C#";
-        course1.Description = ".NET 8 vs...";
-        course1.Price = 0;
-
-        Course course2 = new Course();
-        course2.Id = 2;
-        course2.Name = "Java";
-        course2.Description = "Java 17 ....";
-        course2.Price = 10;
-
-        Course course3 = new Course();
-        course3.Id = 3;
-        course3.Name = "Pyhton";
-        course3.Description = "Pyhton 3.12 ....";
-        course3.Price = 20;
-
-        courses[0] = course1;
-        courses[1] = course2;
-        courses[2] = course3;
+        _courseDal = courseDal;
     }
-    public Course[] GetAll()
+
+    public void Add(Course course)
     {
-        return courses;
+        // Kurs ismi tekrar edemez.
+
+        Course? result = _courseDal.GetByName(course.Name);
+        if(result != null)
+        {
+            Console.WriteLine(course.Name + " isminde bir kurs mevcut");
+            return;
+        }
+        _courseDal.Add(course);
+    }
+
+    public List<Course> GetAll()
+    {
+        // bussiness rules
+
+        return _courseDal.GetAll();
     }
 }
